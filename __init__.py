@@ -21,6 +21,7 @@ from adapt.intent import IntentBuilder
 
 from mycroft.skills.core import MycroftSkill
 from mycroft.util.log import getLogger
+from mycroft import intent_handler
 
 import time
 import pychromecast
@@ -36,29 +37,15 @@ class ChromecastSkill(MycroftSkill):
         super(ChromecastSkill, self).__init__(name="ChromecastSkill")
         self.chromecasts = pychromecast.get_chromecasts()
 
-    def initialize(self):
-        cc_devices_intent = IntentBuilder("CCDevicesIntent"). \
-            require("CCDevicesKeyword").build()
-        self.register_intent(cc_devices_intent, self.handle_cc_devices_intent)
-
-        cc_device_status_intent = IntentBuilder("CCDeviceStatusIntent"). \
-            require("CCDeviceStatusKeyword"). \
-            require("CCDevice").build()
-        self.register_intent(cc_device_status_intent, self.handle_cc_device_status_intent)
-
-        cc_muted_intent = IntentBuilder("CCMutedIntent"). \
-            require("CCMutedKeyword").build()
-        self.register_intent(cc_muted_intent, self.handle_cc_muted_intent)
-
-        cc_play_media_intent = IntentBuilder("CCPlayMediaIntent"). \
-            require("CCPlayMediaKeyword"). \
-            require("CCDevice").build()
-        self.register_intent(cc_play_media_intent, self.handle_cc_play_media_intent)
-
+    @intent_handler(IntentBuilder("CCDevicesIntent")
+			.require("CCDevicesKeyword"))
     def handle_cc_devices_intent(self, message):
         for cc in chromecasts:
             self.speak(cc.device.friendly_name)
 
+    @intent_handler(IntentBuilder("CCDeviceStatusIntent")
+                        .require("CCDeviceStatusKeyword")
+                        .require("CCDevice"))
     def handle_cc_device_status_intent(self, message):
         cc_device = message.data.get("CCDevice")
         cast = next(cc for cc in chromecasts if cc.device.friendly_name == cc_device)
@@ -70,6 +57,9 @@ class ChromecastSkill(MycroftSkill):
         else:
             self.speak("Sorry I had trouble connecting to your chromecast")
 
+
+    @intent_handler(IntentBuilder("CCMutedIntent")
+                        .require("CCMutedKeyword"))
     def handle_cc_muted_intent(self, message):
         cast = next(cc for cc in chromecasts if cc.device.friendly_name == "living room")
         cast.wait()
@@ -80,6 +70,9 @@ class ChromecastSkill(MycroftSkill):
         else:
             self.speak("Sorry I had trouble connecting to your chromecast")
 
+    @intent_handler(IntentBuilder("CCPlayMediaIntent")
+            .require("CCPlayMediaKeyword")
+            .require("CCDevice"))
     def handle_cc_play_media_intent(self, message):
         cc_device = message.data.get("CCDevice")
         cast = next(cc for cc in chromecasts if cc.device.friendly_name == cc_device)
