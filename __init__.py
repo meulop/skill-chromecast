@@ -30,7 +30,6 @@ __author__ = 'eClarity'
 
 LOGGER = getLogger(__name__)
 
-chromecasts = pychromecast.get_chromecasts()
 
 class ChromecastSkill(MycroftSkill):
     def __init__(self):
@@ -40,8 +39,17 @@ class ChromecastSkill(MycroftSkill):
     @intent_handler(IntentBuilder("CCDevicesIntent")
 			.require("CCDevicesKeyword"))
     def handle_cc_devices_intent(self, message):
-        for cc in chromecasts:
-            self.speak(cc.device.friendly_name)
+        try:
+            self.speak("Searching for Chromecast devices")
+            self.chromecasts = pychromecast.get_chromecasts()
+            self.speak("Found %d Chromecast devices" % len(self.chromecasts))
+            if self.chromecasts is None:
+                self.speak("Cannot find any Chromecast devices")
+            else:
+                for cc in self.chromecasts:
+                    self.speak(cc.device.friendly_name)
+        except:
+            self.speak("Something went wrong when trying to find Chromecast devices")
 
     @intent_handler(IntentBuilder("CCDeviceStatusIntent")
                         .require("CCDeviceStatusKeyword")
