@@ -56,7 +56,7 @@ class ChromecastSkill(MycroftSkill):
                         .require("CCDevice"))
     def handle_cc_device_status_intent(self, message):
         cc_device = message.data.get("CCDevice")
-        cast = next(cc for cc in chromecasts if cc.device.friendly_name == cc_device)
+        cast = next(cc for cc in self.chromecasts if cc.device.friendly_name == cc_device)
         cast.wait()
         if cast.status.is_active_input == False:
             self.speak("Your Chromecast device is currently not active")
@@ -69,7 +69,7 @@ class ChromecastSkill(MycroftSkill):
     @intent_handler(IntentBuilder("CCMutedIntent")
                         .require("CCMutedKeyword"))
     def handle_cc_muted_intent(self, message):
-        cast = next(cc for cc in chromecasts if cc.device.friendly_name == "living room")
+        cast = next(cc for cc in self.chromecasts if cc.device.friendly_name == "living room")
         cast.wait()
         if cast.status.volume_muted == False:
             self.speak("Your Chromecast device is currently not muted")
@@ -83,7 +83,7 @@ class ChromecastSkill(MycroftSkill):
             .require("CCDevice"))
     def handle_cc_play_media_intent(self, message):
         cc_device = message.data.get("CCDevice")
-        cast = next(cc for cc in chromecasts if cc.device.friendly_name == cc_device)
+        cast = next(cc for cc in self.chromecasts if cc.device.friendly_name == cc_device)
         mc = cast.media_controller
         self.speak("Playing media on your chromecast now")
         mc.play_media('http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 'video/mp4')
