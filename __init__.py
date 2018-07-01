@@ -46,7 +46,7 @@ class ChromecastSkill(MycroftSkill):
                 self.speak_dialog("search.failure")
             else:
                 devicecount = len(self.chromecasts)
-                plural = (devicecount == 1) ? "" : "s"
+                plural = "" if (devicecount == 1) else "s"
                 self.speak_dialog("search.success",data = { 'devicecount' : devicecount, 'plural': plural} )
                 for cc in self.chromecasts:
                     self.speak(cc.device.friendly_name)
