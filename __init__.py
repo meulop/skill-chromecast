@@ -42,10 +42,12 @@ class ChromecastSkill(MycroftSkill):
         try:
             self.speak("Searching for Chromecast devices")
             self.chromecasts = pychromecast.get_chromecasts()
-            self.speak("Found %d Chromecast devices" % len(self.chromecasts))
             if self.chromecasts is None:
-                self.speak("Cannot find any Chromecast devices")
+                self.speak_dialog("search.failure")
             else:
+		devicecount = len(self.chromecasts)
+                plural = (devicecount == 1) ? "" : "s"
+                self.speak_dialog("search.success",data = { 'devicecount' : devicecount, 'plural': plural} )
                 for cc in self.chromecasts:
                     self.speak(cc.device.friendly_name)
         except:
