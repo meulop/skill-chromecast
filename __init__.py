@@ -39,19 +39,20 @@ class ChromecastSkill(MycroftSkill):
     @intent_handler(IntentBuilder("CCDevicesIntent")
 			.require("CCDevicesKeyword"))
     def handle_cc_devices_intent(self, message):
-        try:
-            self.speak("Searching for Chromecast devices")
-            self.chromecasts = pychromecast.get_chromecasts()
-            if self.chromecasts is None:
-                self.speak_dialog("search.failure")
-            else:
-                devicecount = len(self.chromecasts)
-                plural = "" if (devicecount == 1) else "s"
-                self.speak_dialog("search.success",data = { 'devicecount' : devicecount, 'plural': plural} )
-                for cc in self.chromecasts:
-                    self.speak(cc.device.friendly_name)
-        except:
-            self.speak("Something went wrong when trying to find Chromecast devices")
+#        try:
+        self.speak("Searching for Chromecast devices")
+        self.chromecasts = pychromecast.get_chromecasts()
+        if self.chromecasts is None:
+            self.speak_dialog("search.failure")
+        else:
+            devicecount = len(self.chromecasts)
+            plural = "" if (devicecount == 1) else "s"
+            self.speak("Found %d chromecast%s" % (devicecount,plural))
+            self.speak_dialog("search.success",data = { 'devicecount' : devicecount, 'plural': plural} )
+            for cc in self.chromecasts:
+                self.speak(cc.device.friendly_name)
+#        except:
+#        self.speak("Something went wrong when trying to find Chromecast devices")
 
     @intent_handler(IntentBuilder("CCDeviceStatusIntent")
                         .require("CCDeviceStatusKeyword")
